@@ -41,18 +41,20 @@ Este archivo es crucial para que el modelo de aprendizaje automático interprete
 + Navega a http://localhost:5000/ en tu navegador para acceder a la interfaz de usuario.
 + Completa el formulario con los valores de Nitrogeno, Fosforo, Potasio, Temperatura, Humedad y PH.
 + Haz clic en "Enviar" para procesar los datos y obtener una predicción.
+![Uso en local](static/images/local.png)
 
 **Utilizando Postman**
 + Configura un nuevo request de tipo POST en Postman con la URL http://localhost:5000/prediction.
 + Elige x-www-form-urlencoded como tipo de body.
 + Añade los campos necesarios y envía el request para obtener la predicción como datos de clave-valor.
-
+![Uso con Postman](static/images/postman.png)
 ## Uso (Producción)
-Para acceder al servicio en un entorno de producción, visita el siguiente enlace: https://xjairrs.pythonanywhere.com/
+Para acceder al servicio en un entorno de producción, visita el siguiente enlace: https://agrosabio.pythonanywhere.com/
 
 **API de Producción**
 Esta interfaz está diseñada para ser intuitiva y fácil de usar, asegurando que los usuarios puedan obtener rápidamente la información que necesitan sobre la calidad del suelo.
+![Uso con Postman](static/images/produccion.png)
 
 **Resultados de la Predicción**
 Una vez que los datos son enviados a través del formulario de entrada, la aplicación procesa la información utilizando el modelo de aprendizaje automático Random Forest y muestra los resultados en una interfaz clara y sencilla.
-
+![Uso con Postman](static/images/resultado.png)
