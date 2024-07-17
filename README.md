@@ -27,12 +27,13 @@ Asegúrate de tener el modelo de aprendizaje automático (model_TT_RFC.pkl) y el
 **Archivo de Configuración de Datos**
 El archivo columns_set.json define el esquema de los datos necesarios para realizar una predicción. Es un JSON que mapea cada columna esperada a un valor, inicialmente null, indicando que los valores serán proporcionados en tiempo de ejecución. Los campos incluidos son:
 
-Nitrogen
-Potassium
-Humidity
-Phosphorus
-pH_Value
-Temperature
++Nitrogen
++Potassium
++Humidity
++Phosphorus
++pH_Value
++Temperature
+
 Este archivo es crucial para que el modelo de aprendizaje automático interprete correctamente los datos de entrada.
 
 ## Uso (Desarrollo)
