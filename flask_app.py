@@ -56,7 +56,7 @@ def home():
 @app.route('/prediction', methods=['POST'])
 def predict():
     try:
-        # Get the data from form
+        # Extracción de datos del formulario
         nitrogen = float(request.form.get('Nitrogen', 0))
         potassium = float(request.form.get('Potassium', 0))
         humidity = float(request.form.get('Humidity', 0))
@@ -73,43 +73,42 @@ def predict():
             'Temperature': temperature
         }
 
-        # Load columns schema
+        # Preparación de datos para la predicción
         schema_name = 'columns_set.json'
         schema_dir = os.path.join(current_dir, schema_name)
         with open(schema_dir, 'r') as f:
             cols = json.loads(f.read())['data_columns']
-
-        # Prepare data for prediction
         df = pd.DataFrame([data], columns=cols)
 
-        # Create a prediction
+        # Creación de la predicción
         result = ValuePredictor(data=df)
-        
-         # Enviar datos a la API de Express
-        express_response = send_data_to_express(data)
 
-        # Determine the output
+        # Determinar el resultado
         if int(result) == 1:
             prediction = 'Es un muy buen suelo para sembrar!'
-            good_soil = True
         else:
             prediction = 'No es un suelo apto para sembrar caña, pero podría funcionar para otro cultivo!'
-            good_soil = False
 
         response = {
             'status': 'success',
             'data': data,
-            'prediction': prediction,
-            'good_soil': good_soil,
-            'express_response': express_response
-        }
-    except Exception as e:
-        response = {
-            'status': 'error',
-            'message': str(e)
+            'prediction': prediction
         }
 
-    return jsonify(response)
+        # Guardar la respuesta JSON en un archivo (opcional)
+        json_output_path = os.path.join(current_dir, 'static', 'output.json')
+        with open(json_output_path, 'w') as json_file:
+            json.dump(response, json_file)
+
+        # Enviar datos a la API de Express
+        express_response = send_data_to_express(data)
+
+        # Renderizar la plantilla con la predicción y respuesta de Express
+        return render_template('prediction.html', prediction=prediction, express_response=express_response)
+
+    except Exception as e:
+        return render_template('error.html', message=str(e))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
