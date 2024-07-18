@@ -22,7 +22,7 @@ current_dir = os.path.dirname(__file__)
 # Flask app
 app = Flask(__name__, static_folder = 'static', template_folder = 'template')
 # O para permitir de todos los orígenes (no recomendado para producción)
-CORS(app, resources={r"/prediction*": {"origins": "*"}})
+CORS(app, resources={r"/prediction*": {"origins": "http://localhost:4200"}})
 # Logging
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
@@ -45,6 +45,14 @@ def send_data_to_express(data):
     response = requests.post(url, json=data)  
     return response.json()  
 
+@app.errorhandler(500)
+def handle_500(error):
+    return jsonify({"error": str(error), "status": "error"}), 500
+
+
+@app.errorhandler(404)
+def handle_404(error):
+    return jsonify({"error": "Not found", "status": "error"}), 404
 
 # Home page
 @app.route('/')
@@ -90,12 +98,27 @@ def predict():
         # Determine the output
         if int(result) == 1:
             prediction = 'Es un muy buen suelo para sembrar!'
+            good_soil = True
         else:
             prediction = 'No es un suelo apto para sembrar caña, pero podría funcionar para otro cultivo!'
+            good_soil = False
 
-        return render_template('prediction.html', prediction=prediction)
+        response = {
+            'status': 'success',
+            'data': data,
+            'prediction': prediction,
+            'good_soil': good_soil,
+            'express_response': express_response
+        }
     except Exception as e:
-        return render_template('error.html', message=str(e))
+        response = {
+            'status': 'error',
+            'message': str(e)
+        }
+
+    return jsonify(response)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
