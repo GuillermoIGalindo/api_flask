@@ -90,25 +90,12 @@ def predict():
         # Determine the output
         if int(result) == 1:
             prediction = 'Es un muy buen suelo para sembrar!'
-            good_soil = True
         else:
             prediction = 'No es un suelo apto para sembrar caña, pero podría funcionar para otro cultivo!'
-            good_soil = False
 
-        response = {
-            'status': 'success',
-            'data': data,
-            'prediction': prediction,
-            'good_soil': good_soil,
-            'express_response': express_response
-        }
+        return render_template('prediction.html', prediction=prediction)
     except Exception as e:
-        response = {
-            'status': 'error',
-            'message': str(e)
-        }
-
-    return jsonify(response)
+        return render_template('error.html', message=str(e))
 
 if __name__ == '__main__':
     app.run(debug=True)
