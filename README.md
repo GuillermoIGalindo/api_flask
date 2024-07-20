@@ -7,22 +7,57 @@ El API utiliza un modelo de aprendizaje automático entrenado para predecir la c
 ## Requerimientos
 Para ejecutar este servicio, necesitarás los siguientes componentes:
 
-+ Python 3.8 o superior
++ Python 3.9 o superior
 + Flask
 + Pandas
 + NumPy
 + Joblib
 + Requests
++ Docker
 
 ## Instalación
 Para instalar y configurar tu ambiente local, sigue estos pasos:
 
 + Clona este repositorio en tu máquina local.
 + Instala las dependencias necesarias con el siguiente comando:
-+ bash
-+ Copiar código
 + pip install flask pandas numpy joblib requests flask-cors
 + Asegúrate de tener el modelo de aprendizaje automático (model_TT_RFC.pkl) y el esquema de datos (columns_set.json) en el directorio correcto como se especifica en el código.
+
+**Usar Docker**
+Asegúrate de tener Docker instalado en tu sistema. Puedes descargarlo e instalarlo desde Docker. https://www.docker.com/
+
+Crea un archivo Dockerfile en el directorio raíz de tu proyecto con el siguiente contenido:
+
+# Usa una imagen base de Python
+FROM python:3.9-slim
+
+# Establece el directorio de trabajo en el contenedor
+WORKDIR /app
+
+# Copia el archivo requirements.txt en el directorio de trabajo
+COPY requirements.txt .
+
+# Instala las dependencias
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia el resto de los archivos de la aplicación en el contenedor
+COPY . .
+
+# Expone el puerto en el que correrá la aplicación Flask
+EXPOSE 5000
+
+# Define el comando para correr la aplicación
+CMD ["python", "Server_TT.py"]
+Asegúrate de que tu archivo requirements.txt esté actualizado con todas las dependencias necesarias para tu proyecto.
+
+Construye la imagen de Docker con el siguiente comando:
+
+docker build -t mi-proyecto-flask .
+Corre el contenedor de Docker con el siguiente comando:
+
+docker run -d -p 5000:5000 mi-proyecto-flask
+Esto ejecutará la aplicación Flask en un contenedor Docker y la expondrá en el puerto 5000.
+
 
 **Archivo de Configuración de Datos**
 El archivo columns_set.json define el esquema de los datos necesarios para realizar una predicción. Es un JSON que mapea cada columna esperada a un valor, inicialmente null, indicando que los valores serán proporcionados en tiempo de ejecución. Los campos incluidos son:
