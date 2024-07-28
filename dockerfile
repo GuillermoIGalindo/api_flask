@@ -6,7 +6,6 @@ RUN apt-get update && apt-get install -y \
     libatlas-base-dev \
     g++ \
     gcc \
-    cython \
     && rm -rf /var/lib/apt/lists/*
 
 # Establecer el directorio de trabajo
@@ -16,7 +15,10 @@ WORKDIR /app
 COPY . /app
 
 # Actualizar pip y setuptools
-RUN pip install --upgrade pip setuptools
+RUN pip install --upgrade pip setuptools wheel
+
+# Instalar cython usando pip
+RUN pip install cython
 
 # Instalar las dependencias de Python
 RUN pip install -r requirements.txt
