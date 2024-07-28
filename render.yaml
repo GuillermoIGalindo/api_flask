@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ejemplo-flask
+    name: mi-proyecto-flask
     env: python
     buildCommand: |
       apt-get update && \
