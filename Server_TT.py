@@ -22,7 +22,7 @@ current_dir = os.path.dirname(__file__)
 # Flask app
 app = Flask(__name__, static_folder = 'static', template_folder = 'template')
 # O para permitir de todos los orígenes (no recomendado para producción)
-CORS(app, resources={r"/prediction*": {"origins": "http://localhost:4200"}})
+CORS(app, resources={r"/prediction*": {"origins": "https://api-agrosabio.onrender.com"}})
 # Logging
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
@@ -41,7 +41,8 @@ def ValuePredictor(data = pd.DataFrame):
 
 # Función para enviar datos a la API de Express
 def send_data_to_express(data):
-    url = 'http://localhost:3000/api/store'  
+    url = "https://api-agrosabio.onrender.com/api/store"  
+ 
     response = requests.post(url, json=data)  
     return response.json()  
 
@@ -71,7 +72,9 @@ def predict():
         pH_Value = float(request.form.get('pH_Value', 0))
         temperature = float(request.form.get('Temperature', 0))
 
-        data = {
+        # Additional code remains the same
+
+        data = {    
             'Nitrogen': nitrogen,
             'Potassium': potassium,
             'Humidity': humidity,
@@ -97,10 +100,10 @@ def predict():
 
         # Determine the output
         if int(result) == 1:
-            prediction = 'Es un muy buen suelo para sembrar!'
+            prediction = '¡Es un muy buen suelo para sembrar!'
             good_soil = True
         else:
-            prediction = 'No es un suelo apto para sembrar caña, pero podría funcionar para otro cultivo!'
+            prediction = '¡No es un suelo apto para sembrar caña, pero se puede mejorar!'
             good_soil = False
 
         response = {

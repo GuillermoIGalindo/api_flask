@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: ejemplo-flask
+    env: python
+    buildCommand: |
+      apt-get update && \
+      apt-get install -y build-essential libatlas-base-dev && \
+      pip install -r requirements.txt
+    startCommand: python flask_app.py
