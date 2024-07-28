@@ -1,9 +1,12 @@
 FROM python:3.11-slim
 
-# Instalar las dependencias del sistema necesarias para compilar numpy
+# Instalar las dependencias del sistema necesarias para compilar numpy y scikit-learn
 RUN apt-get update && apt-get install -y \
     build-essential \
     libatlas-base-dev \
+    g++ \
+    gcc \
+    cython \
     && rm -rf /var/lib/apt/lists/*
 
 # Establecer el directorio de trabajo

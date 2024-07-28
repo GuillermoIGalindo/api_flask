@@ -21,9 +21,8 @@ current_dir = os.path.dirname(__file__)
 
 # Flask app
 app = Flask(__name__, static_folder = 'static', template_folder = 'template')
-
 # O para permitir de todos los orígenes (no recomendado para producción)
-CORS(app, resources={r"/prediction*": {"origins": "*"}})
+CORS(app, resources={r"/prediction*": {"origins": "https://api-agrosabio.onrender.com"}})
 # Logging
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
 app.logger.setLevel(logging.ERROR)
@@ -42,10 +41,19 @@ def ValuePredictor(data = pd.DataFrame):
 
 # Función para enviar datos a la API de Express
 def send_data_to_express(data):
-    url = 'http://localhost:3000/api/store' 
-    response = requests.post(url, json=data)  # Enviar solicitud POST
+    url = "https://api-agrosabio.onrender.com/api/store"  
+ 
+    response = requests.post(url, json=data)  
     return response.json()  
 
+@app.errorhandler(500)
+def handle_500(error):
+    return jsonify({"error": str(error), "status": "error"}), 500
+
+
+@app.errorhandler(404)
+def handle_404(error):
+    return jsonify({"error": "Not found", "status": "error"}), 404
 
 # Home page
 @app.route('/')
@@ -56,7 +64,7 @@ def home():
 @app.route('/prediction', methods=['POST'])
 def predict():
     try:
-        # Extracción de datos del formulario
+        # Get the data from form
         nitrogen = float(request.form.get('Nitrogen', 0))
         potassium = float(request.form.get('Potassium', 0))
         humidity = float(request.form.get('Humidity', 0))
@@ -64,7 +72,9 @@ def predict():
         pH_Value = float(request.form.get('pH_Value', 0))
         temperature = float(request.form.get('Temperature', 0))
 
-        data = {
+        # Additional code remains the same
+
+        data = {    
             'Nitrogen': nitrogen,
             'Potassium': potassium,
             'Humidity': humidity,
@@ -73,41 +83,44 @@ def predict():
             'Temperature': temperature
         }
 
-        # Preparación de datos para la predicción
+        # Load columns schema
         schema_name = 'columns_set.json'
         schema_dir = os.path.join(current_dir, schema_name)
         with open(schema_dir, 'r') as f:
             cols = json.loads(f.read())['data_columns']
+
+        # Prepare data for prediction
         df = pd.DataFrame([data], columns=cols)
 
-        # Creación de la predicción
+        # Create a prediction
         result = ValuePredictor(data=df)
+        
+         # Enviar datos a la API de Express
+        express_response = send_data_to_express(data)
 
-        # Determinar el resultado
+        # Determine the output
         if int(result) == 1:
-            prediction = 'Es un muy buen suelo para sembrar!'
+            prediction = '¡Es un muy buen suelo para sembrar!'
+            good_soil = True
         else:
-            prediction = 'No es un suelo apto para sembrar caña, pero podría funcionar para otro cultivo!'
+            prediction = '¡No es un suelo apto para sembrar caña, pero se puede mejorar!'
+            good_soil = False
 
         response = {
             'status': 'success',
             'data': data,
-            'prediction': prediction
+            'prediction': prediction,
+            'good_soil': good_soil,
+            'express_response': express_response
+        }
+    except Exception as e:
+        response = {
+            'status': 'error',
+            'message': str(e)
         }
 
-        # Guardar la respuesta JSON en un archivo (opcional)
-        json_output_path = os.path.join(current_dir, 'static', 'output.json')
-        with open(json_output_path, 'w') as json_file:
-            json.dump(response, json_file)
+    return jsonify(response)
 
-        # Enviar datos a la API de Express
-        express_response = send_data_to_express(data)
-
-        # Renderizar la plantilla con la predicción y respuesta de Express
-        return render_template('prediction.html', prediction=prediction, express_response=express_response)
-
-    except Exception as e:
-        return render_template('error.html', message=str(e))
 
 
 if __name__ == '__main__':
